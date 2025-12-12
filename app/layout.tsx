@@ -41,9 +41,9 @@ export const metadata: Metadata = {
     siteName: "Ramkrishna's Portfolio",
     images: [
       {
-        url: "/profile.jpg",
+        url: "/opengraph-image",
         width: 1200,
-        height: 1200,
+        height: 630,
         alt: "Ramkrishna Sharma - Portfolio",
       },
     ],
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ramkrishna's Portfolio Website",
     description: "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT.",
-    images: ["/profile.jpg"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
