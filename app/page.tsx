@@ -97,10 +97,9 @@ export default function Home() {
             </div>
 
             <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-              I design and build systems that help people work with complex information—whether that's researchers at
-              NASA, students sharing knowledge, or teams navigating large datasets. My work spans AI-driven interfaces,
-              collaborative research tools, and data-rich platforms, with a focus on turning messy, real-world problems
-              into intuitive products.
+              Complex information. Whether that's researchers at NASA, students sharing knowledge, or teams navigating
+              large datasets. My work spans AI-driven interfaces, collaborative research tools, and data-rich platforms,
+              with a focus on turning messy, real-world problems into intuitive products.
             </p>
 
             <div className="space-y-4">

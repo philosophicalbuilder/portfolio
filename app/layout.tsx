@@ -14,6 +14,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://your-vercel-url.vercel.app'),
   title: "Ramkrishna's Portfolio Website",
   description:
     "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
@@ -40,10 +41,10 @@ export const metadata: Metadata = {
     siteName: "Ramkrishna's Portfolio",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/profile.jpg",
         width: 1200,
-        height: 630,
-        alt: "Ramkrishna's Portfolio Website",
+        height: 1200,
+        alt: "Ramkrishna Sharma - Portfolio",
       },
     ],
   },
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ramkrishna's Portfolio Website",
     description: "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT.",
-    images: ["/og-image.jpg"],
+    images: ["/profile.jpg"],
   },
   robots: {
     index: true,
