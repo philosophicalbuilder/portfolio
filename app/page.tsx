@@ -3,6 +3,28 @@
 import Image from "next/image"
 import { ExternalLink } from "lucide-react"
 
+// Helper function to extract YouTube video ID from URL
+function getYouTubeVideoId(url: string): string | null {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/
+  const match = url.match(regExp)
+  return match && match[2].length === 11 ? match[2] : null
+}
+
+// Helper function to extract timestamp from YouTube URL (returns seconds)
+function getYouTubeTimestamp(url: string): number | null {
+  // Check for t= parameter (e.g., &t=114s or &t=114)
+  const tMatch = url.match(/[?&]t=(\d+)(?:s)?/i)
+  if (tMatch) {
+    return parseInt(tMatch[1], 10)
+  }
+  return null
+}
+
+// Helper function to check if URL is a YouTube link
+function isYouTubeUrl(url: string): boolean {
+  return /youtube\.com|youtu\.be/.test(url)
+}
+
 export default function Home() {
   const projects = [
     {
@@ -158,31 +180,50 @@ export default function Home() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              {projects.map((project) => (
-                <a
-                  key={project.id}
-                  href={project.link}
-                  target={project.link ? "_blank" : undefined}
-                  rel={project.link ? "noopener noreferrer" : undefined}
-                  className="group overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                >
-                  <div className="aspect-video overflow-hidden bg-black">
-                    <Image
-                      src={project.image || "/placeholder.svg"}
-                      alt={project.title}
-                      width={600}
-                      height={400}
-                      className="h-full w-full object-contain transition-all duration-300"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
-                      {project.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-white/60 transition-colors duration-500">{project.description}</p>
-                  </div>
-                </a>
-              ))}
+              {projects.map((project) => {
+                const isYouTube = isYouTubeUrl(project.link)
+                const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
+                // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
+                const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
+                // YAL project (id 4) should show static image, not autoplay video
+                const shouldShowVideo = isYouTube && videoId && project.id !== 4
+
+                return (
+                  <a
+                    key={project.id}
+                    href={project.link}
+                    target={project.link ? "_blank" : undefined}
+                    rel={project.link ? "noopener noreferrer" : undefined}
+                    className="group overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                  >
+                    <div className="aspect-video overflow-hidden bg-black relative">
+                      {shouldShowVideo ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&start=${startTime}`}
+                          className="absolute inset-0 w-full h-full"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
+                          title={project.title}
+                        />
+                      ) : (
+                        <Image
+                          src={project.image || "/placeholder.svg"}
+                          alt={project.title}
+                          width={600}
+                          height={400}
+                          className="h-full w-full object-contain transition-all duration-300"
+                        />
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
+                        {project.title}
+                      </h3>
+                      <p className="mt-1 text-sm text-white/60 transition-colors duration-500">{project.description}</p>
+                    </div>
+                  </a>
+                )
+              })}
             </div>
           </div>
         </div>
