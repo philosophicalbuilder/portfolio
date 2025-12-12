@@ -14,45 +14,44 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Jessin Sam - AI Innovation & Creative Technology | jess.vc",
+  title: "Ramkrishna's Portfolio Website",
   description:
-    "Passionate about AI innovation and creative technology. Founder of Eqqal and 1UI. Building tools that bridge the gap between imagination and creation.",
+    "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
   keywords: [
-    "Jessin Sam",
-    "AI Innovation",
-    "Creative Technology",
-    "Eqqal",
-    "1UI",
-    "Computer Vision",
-    "Design",
+    "Ramkrishna Sharma",
+    "Portfolio",
+    "Computer Science",
+    "University of Virginia",
+    "NASA",
+    "MIT",
     "Product Design",
+    "Product Management",
     "AI Tools",
   ],
-  authors: [{ name: "Jessin Sam", url: "https://jessinsam.com" }],
-  creator: "Jessin Sam",
+  authors: [{ name: "Ramkrishna Sharma" }],
+  creator: "Ramkrishna Sharma",
   openGraph: {
     type: "profile",
     locale: "en_US",
-    url: "https://jess.vc",
-    title: "Jessin Sam - AI Innovation & Creative Technology",
+    url: "https://github.com/philosophicalbuilder/portfolio",
+    title: "Ramkrishna's Portfolio Website",
     description:
-      "Passionate about AI innovation and creative technology. Founder of Eqqal and 1UI. Building tools that bridge the gap between imagination and creation.",
-    siteName: "jess.vc",
+      "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
+    siteName: "Ramkrishna's Portfolio",
     images: [
       {
-        url: "https://jess.vc/og-image.jpg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Jessin Sam - AI Innovation & Creative Technology",
+        alt: "Ramkrishna's Portfolio Website",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jessin Sam - AI Innovation & Creative Technology",
-    description: "Passionate about AI innovation and creative technology. Founder of Eqqal and 1UI.",
-    creator: "@jessinvibe",
-    images: ["https://jess.vc/og-image.jpg"],
+    title: "Ramkrishna's Portfolio Website",
+    description: "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT.",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -91,30 +90,29 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Person",
-              name: "Jessin Sam",
-              url: "https://jess.vc",
-              image: "https://jess.vc/profile.jpg",
+              name: "Ramkrishna Sharma",
+              url: "https://github.com/philosophicalbuilder/portfolio",
+              image: "/profile.jpg",
               sameAs: [
-                "https://x.com/jessinvibe",
-                "https://jessinsam.com",
-                "https://www.eqqal.com",
-                "https://www.1ui.dev",
+                "https://www.youtube.com/@TheInnovationLabx",
               ],
-              jobTitle: "Founder & AI Innovator",
+              jobTitle: "Computer Science Student & Product Designer",
               worksFor: [
                 {
                   "@type": "Organization",
-                  name: "Eqqal",
-                  url: "https://www.eqqal.com",
+                  name: "NASA",
                 },
                 {
                   "@type": "Organization",
-                  name: "1UI",
-                  url: "https://www.1ui.dev",
+                  name: "MIT",
+                },
+                {
+                  "@type": "Organization",
+                  name: "University of Virginia",
                 },
               ],
               description:
-                "Passionate about AI innovation and creative technology. With a background in computer vision and design, I'm committed to building tools that bridge the gap between imagination and creation.",
+                "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
             }),
           }}
         />
