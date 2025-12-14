@@ -1,6 +1,4 @@
 import { ImageResponse } from 'next/og'
-import fs from 'fs'
-import path from 'path'
 
 export const alt = "Ramkrishna Sharma - Portfolio"
 export const size = {
@@ -11,17 +9,6 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image() {
-  // Read profile image from public directory
-  const profileImagePath = path.join(process.cwd(), 'public', 'profile.jpg')
-  let profileImageBase64 = null
-  
-  try {
-    const imageBuffer = fs.readFileSync(profileImagePath)
-    profileImageBase64 = `data:image/jpeg;base64,${imageBuffer.toString('base64')}`
-  } catch (error) {
-    console.error('Error reading profile image:', error)
-  }
-
   return new ImageResponse(
     (
       <div
@@ -46,29 +33,29 @@ export default async function Image() {
             padding: '80px',
           }}
         >
-          {/* Profile Picture */}
-          {profileImageBase64 && (
-            <div
+          {/* Profile Picture Placeholder */}
+          <div
+            style={{
+              display: 'flex',
+              width: '240',
+              height: '240',
+              borderRadius: '50%',
+              border: '4px solid white',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span
               style={{
-                display: 'flex',
-                width: '240',
-                height: '240',
-                borderRadius: '50%',
-                border: '4px solid white',
-                overflow: 'hidden',
+                fontSize: '80px',
+                fontWeight: 'bold',
+                color: 'white',
               }}
             >
-              <img
-                src={profileImageBase64}
-                alt="Profile"
-                width={240}
-                height={240}
-                style={{
-                  objectFit: 'cover',
-                }}
-              />
-            </div>
-          )}
+              RS
+            </span>
+          </div>
 
           {/* Text Content */}
           <div
