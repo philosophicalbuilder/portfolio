@@ -96,21 +96,12 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="space-y-4">
-              <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-                By day, I'm a UVA CS student ('27) tackling the messy intersection of code and design. I consider myself
-                a translator: I take dense, complex data and turn it into intuitive products that people actually want to
-                use. Whether I'm founding platforms like The Frontier Project or prototyping new tools, I'm obsessed
-                with making technology empower people rather than confuse them.
-              </p>
-              <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-                By night (or just when I need a break), I step away from the pixels. You can usually find me getting
-                my hands dirty with charcoal drawings, losing track of time over a sketchbook, or tutoring students to
-                help make their academic lives a little less stressful. But the real main character of my life is
-                Chuchu, my 9-year-old golden retriever. He doesn't care about my code or my products, he just wants
-                snacks and outside time, and honestly? I respect that perspective.
-              </p>
-            </div>
+            <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
+              I'm a UVA CS student ('27) bridging the gap between code and design. Whether founding platforms like The
+              Frontier Project or prototyping new tools, I translate dense data into intuitive products that empower
+              users. Off-screen, I love doing charcoal sketches, tutoring students, and serving as the dedicated support
+              staff for Chuchu, my 9-year-old golden retriever.
+            </p>
           </div>
 
           <div className="space-y-6">
