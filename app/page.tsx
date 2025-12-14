@@ -96,46 +96,54 @@ export default function Home() {
               </a>
             </div>
 
-            <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-              Complex information. Whether that's researchers at NASA, students sharing knowledge, or teams navigating
-              large datasets. My work spans AI-driven interfaces, collaborative research tools, and data-rich platforms,
-              with a focus on turning messy, real-world problems into intuitive products.
-            </p>
-
             <div className="space-y-4">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 transition-colors duration-500">
+              <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
+                By day, I'm a UVA CS student ('27) tackling the messy intersection of code and design. I consider myself
+                a translator: I take dense, complex data and turn it into intuitive products that people actually want to
+                use. Whether I'm founding platforms like The Frontier Project or prototyping new tools, I'm obsessed
+                with making technology empower people rather than confuse them.
+              </p>
+              <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
+                By night (or just when I need a break), I step away from the pixels. You can usually find me getting
+                my hands dirty with charcoal drawings, losing track of time over a sketchbook, or tutoring students to
+                help make their academic lives a little less stressful. But the real main character of my life is
+                Chuchu, my 9-year-old golden retriever. He doesn't care about my code or my products, he just wants
+                snacks and outside time, and honestly? I respect that perspective.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 transition-colors duration-500 mb-4">
                 EXPERIENCE
               </h2>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <div className="flex flex-col items-center gap-2">
                   <Image
                     src="/logos/nasa-logo.png"
                     alt="NASA"
-                    width={80}
-                    height={80}
-                    className="h-20 w-20 object-contain"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 object-contain"
                   />
-                  <div>
-                    <p className="text-sm font-bold text-white transition-colors duration-500">NASA</p>
-                    <p className="text-sm text-white/70 transition-colors duration-500">Product Designer and PM</p>
-                  </div>
+                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">NASA</p>
+                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Product Designer and PM</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-center gap-2">
                   <Image
                     src="/logos/mit-logo.png"
                     alt="MIT"
-                    width={80}
-                    height={80}
-                    className="h-20 w-20 object-contain"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 object-contain"
                   />
-                  <div>
-                    <p className="text-sm font-bold text-white transition-colors duration-500">MIT</p>
-                    <p className="text-sm text-white/70 transition-colors duration-500">Policy Analyst</p>
-                  </div>
+                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">MIT</p>
+                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Policy Analyst</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-center gap-2">
                   <Image
                     src="/logos/nsf-logo.png"
                     alt="NSF"
@@ -143,15 +151,11 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <div>
-                    <p className="text-sm font-bold text-white transition-colors duration-500">
-                      U.S National Science Foundation
-                    </p>
-                    <p className="text-sm text-white/70 transition-colors duration-500">Data Science Intern</p>
-                  </div>
+                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">NSF</p>
+                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Data Science Intern</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col items-center gap-2">
                   <Image
                     src="/logos/gt-logo.png"
                     alt="Georgia Tech"
@@ -159,18 +163,24 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <div>
-                    <p className="text-sm font-bold text-white transition-colors duration-500">
-                      Georgia Institute of Technology
-                    </p>
-                    <p className="text-sm text-white/70 transition-colors duration-500">Product Manager</p>
-                  </div>
+                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">Georgia Tech</p>
+                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Product Manager</p>
+                </div>
+
+                <div className="flex flex-col items-center gap-2">
+                  <Image
+                    src="/logos/georgetown-logo.png"
+                    alt="Georgetown University"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 object-contain"
+                  />
+                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">Georgetown</p>
+                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Quantum Researcher</p>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-tight text-white transition-colors duration-500 lg:text-3xl">
                 PROJECTS

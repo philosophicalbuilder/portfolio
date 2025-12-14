@@ -85,3 +85,4 @@ This Next.js project can be deployed to Vercel in several ways. Choose the metho
 - Ensure all dependencies are in `package.json`
 - Check that Node.js version is compatible (Vercel uses Node 18+ by default)
 
+
