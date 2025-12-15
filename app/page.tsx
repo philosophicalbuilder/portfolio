@@ -221,7 +221,6 @@ export default function Home() {
               </h1>
               <p className="text-sm tracking-wide text-white/60 transition-colors duration-500">
                 Computer Science student at the University of Virginia, School of Engineering and Applied Sciences.
-                (looking for Summer 2026 internships!)
               </p>
               <a
                 href="https://www.youtube.com/@TheInnovationLabx/videos"
@@ -235,7 +234,7 @@ export default function Home() {
             </div>
 
             <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-              I'm a UVA CS student ('27) bridging the gap between code and design. Whether founding platforms like The
+              I'm a UVA CS student bridging the gap between code and design. Whether founding platforms like The
               Frontier Project or prototyping new tools, I translate dense data into intuitive products that empower
               users. Off-screen, I love doing charcoal sketches, tutoring students, and serving as the dedicated support
               staff for Chuchu, my 9-year-old golden retriever.
