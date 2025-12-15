@@ -2,6 +2,8 @@
 
 import Image from "next/image"
 import { ExternalLink } from "lucide-react"
+import { useState } from "react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 // Helper function to extract YouTube video ID from URL
 function getYouTubeVideoId(url: string): string | null {
@@ -25,8 +27,33 @@ function isYouTubeUrl(url: string): boolean {
   return /youtube\.com|youtu\.be/.test(url)
 }
 
+type Project = {
+  id: number
+  title: string
+  description: string
+  image: string
+  link: string
+}
+
+type Tutorial = {
+  id: number
+  title: string
+  description: string
+  link?: string
+  status?: "live" | "coming-soon"
+}
+
+type Video = {
+  id: number
+  title: string
+  link: string
+}
+
 export default function Home() {
-  const projects = [
+  const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "videos">("projects")
+  const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
+
+  const projects: Project[] = [
     {
       id: 1,
       title: "NASA | The MADI Project",
@@ -58,6 +85,117 @@ export default function Home() {
         '"Yet Another LLM" (YAL) is an LLM assistant that helps buyers across the full lifecycle of an online purchase. "Can you find a yellow dress with roses for less than $50?"',
       image: "/projects/yal-project.png",
       link: "https://www.youtube.com/watch?v=Loir7tDrp7Y&t=114s",
+    },
+  ]
+
+  const tutorials: Tutorial[] = [
+    {
+      id: 5,
+      title: "Python",
+      description:
+        "A comprehensive Python tutorial covering fundamentals — printing, data types, user input, typecasting, strings, boolean operators, and conditional branches.",
+      link: "https://sapphire-eoraptor-096.notion.site/ebd/8b5fbff75cc646f0b2f418a859bc15a0",
+      status: "live",
+    },
+    {
+      id: 1,
+      title: "React Fundamentals",
+      description:
+        "A hands-on React notebook that walks through components, JSX, props, state, and hooks — with examples you can tweak as you learn.",
+      link: "https://sapphire-eoraptor-096.notion.site/ebd/1a2a644271ca47be9d2e1cedaeccdd05",
+      status: "live",
+    },
+    {
+      id: 2,
+      title: "Web Development by Ramkrishna Sharma",
+      description:
+        "A beginner-friendly guide to the web — what HTML, CSS, and JavaScript do, how MDN docs work, and how to wire a full page together.",
+      link: "https://sapphire-eoraptor-096.notion.site/ebd/fdce77dede034d54adeaa9f9b4ece946",
+      status: "live",
+    },
+    {
+      id: 3,
+      title: "Node.js and Express Tutorial",
+      description:
+        "Step‑by‑step notes on building backend APIs with Node.js and Express — routing, middleware, and sending JSON from your own server.",
+      link: "https://sapphire-eoraptor-096.notion.site/ebd/3d741450920348e0984b81769cf5a108",
+      status: "live",
+    },
+    {
+      id: 4,
+      title: "Data Structures and Algorithms",
+      description:
+        "A comprehensive guide to fundamental data structures and algorithms — arrays, linked lists, trees, graphs, sorting, and searching with practical examples.",
+      link: "https://sapphire-eoraptor-096.notion.site/ebd/7d8add07673c479698d906b46137f471",
+      status: "live",
+    },
+  ]
+
+  const videos: Video[] = [
+    {
+      id: 1,
+      title: "Video 1",
+      link: "https://www.youtube.com/watch?v=j4QLEQyCwwI&t=308s",
+    },
+    {
+      id: 2,
+      title: "Video 2",
+      link: "https://www.youtube.com/watch?v=pbjniFi3O04&t=1321s",
+    },
+    {
+      id: 3,
+      title: "Video 3",
+      link: "https://www.youtube.com/watch?v=uTdU450oHS4&t=884s",
+    },
+    {
+      id: 4,
+      title: "Video 4",
+      link: "https://www.youtube.com/watch?v=JR7jSYWzrmc&t=5317s",
+    },
+    {
+      id: 5,
+      title: "Video 5",
+      link: "https://www.youtube.com/watch?v=jv02kCUqr7o&t=810s",
+    },
+    {
+      id: 6,
+      title: "Video 6",
+      link: "https://www.youtube.com/watch?v=Rnt2O64WnbE&t=455s",
+    },
+    {
+      id: 7,
+      title: "Video 7",
+      link: "https://www.youtube.com/watch?v=x_AwYOHLtyU&t=806s",
+    },
+    {
+      id: 8,
+      title: "Video 8",
+      link: "https://www.youtube.com/watch?v=hTjTfqzjeGY&t=137s",
+    },
+    {
+      id: 9,
+      title: "Video 9",
+      link: "https://www.youtube.com/watch?v=7H-Xki7-h_0&t=885s",
+    },
+    {
+      id: 10,
+      title: "Video 10",
+      link: "https://www.youtube.com/watch?v=aGwJTTq471I",
+    },
+    {
+      id: 11,
+      title: "Video 11",
+      link: "https://www.youtube.com/watch?v=AqWTtpKlV_g&t=389s",
+    },
+    {
+      id: 12,
+      title: "Video 12",
+      link: "https://www.youtube.com/watch?v=2EUS24ViJ40&t=887s",
+    },
+    {
+      id: 13,
+      title: "Video 13",
+      link: "https://www.youtube.com/watch?v=VsSuoUhOHPY&t=665s",
     },
   ]
 
@@ -172,58 +310,222 @@ export default function Home() {
               </div>
             </div>
 
-            <div>
-              <h2 className="text-2xl font-bold uppercase tracking-tight text-white transition-colors duration-500 lg:text-3xl">
-                PROJECTS
-              </h2>
-              <p className="mt-2 text-sm text-white/60 transition-colors duration-500">A showcase of my latest work</p>
-            </div>
+            <div className="space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold uppercase tracking-tight text-white transition-colors duration-500 lg:text-3xl">
+                    WORK
+                  </h2>
+                  <p className="mt-2 text-sm text-white/60 transition-colors duration-500">
+                    Toggle between shipped projects, written deep-dives, and videos.
+                  </p>
+                </div>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              {projects.map((project) => {
-                const isYouTube = isYouTubeUrl(project.link)
-                const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
-                // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
-                const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
-                // YAL project (id 4) should show static image, not autoplay video
-                const shouldShowVideo = isYouTube && videoId && project.id !== 4
-
-                return (
-                  <a
-                    key={project.id}
-                    href={project.link}
-                    target={project.link ? "_blank" : undefined}
-                    rel={project.link ? "noopener noreferrer" : undefined}
-                    className="group overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                <div className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 p-1 text-xs font-medium uppercase tracking-wide text-white/60">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("projects")}
+                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
+                      activeTab === "projects"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-white/60 hover:bg-white/10"
+                    }`}
                   >
-                    <div className="aspect-video overflow-hidden bg-black relative">
-                      {shouldShowVideo ? (
+                    Projects
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("videos")}
+                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
+                      activeTab === "videos"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-white/60 hover:bg-white/10"
+                    }`}
+                  >
+                    Videos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("tutorials")}
+                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
+                      activeTab === "tutorials"
+                        ? "bg-white text-black shadow-sm"
+                        : "text-white/60 hover:bg-white/10"
+                    }`}
+                  >
+                    Written Tutorials
+                  </button>
+                </div>
+              </div>
+
+              {activeTab === "videos" ? (
+                <div className="grid gap-6 pt-2 sm:grid-cols-2">
+                  {videos.map((video) => {
+                    const videoId = getYouTubeVideoId(video.link)
+
+                    return (
+                      <a
+                        key={video.id}
+                        href={video.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
+                      >
+                        <div className="relative aspect-video overflow-hidden bg-black">
+                          {videoId && (
+                            <>
+                              <Image
+                                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                                alt={video.title}
+                                width={640}
+                                height={360}
+                                className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-75"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-all duration-300 group-hover:bg-black/10">
+                                <div className="rounded-full bg-white/90 p-4 transition-transform duration-300 group-hover:scale-110">
+                                  <svg
+                                    className="h-8 w-8 text-black"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
+                            {video.title}
+                          </h3>
+                        </div>
+                      </a>
+                    )
+                  })}
+                </div>
+              ) : activeTab === "projects" ? (
+                <div className="grid gap-6 pt-2 sm:grid-cols-2">
+                  {projects.map((project) => {
+                    const isYouTube = isYouTubeUrl(project.link)
+                    const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
+                    // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
+                    const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
+                    // YAL project (id 4) should show static image, not autoplay video
+                    const shouldShowVideo = isYouTube && videoId && project.id !== 4
+
+                    return (
+                      <a
+                        key={project.id}
+                        href={project.link}
+                        target={project.link ? "_blank" : undefined}
+                        rel={project.link ? "noopener noreferrer" : undefined}
+                        className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
+                      >
+                        <div className="relative aspect-video overflow-hidden bg-black">
+                          {shouldShowVideo ? (
+                            <iframe
+                              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&start=${startTime}`}
+                              className="absolute inset-0 h-full w-full"
+                              allow="autoplay; encrypted-media"
+                              allowFullScreen
+                              title={project.title}
+                            />
+                          ) : (
+                            <Image
+                              src={project.image || "/placeholder.svg"}
+                              alt={project.title}
+                              width={600}
+                              height={400}
+                              className="h-full w-full object-contain transition-all duration-300"
+                            />
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
+                            {project.title}
+                          </h3>
+                          <p className="mt-1 text-sm text-white/60 transition-colors duration-500">
+                            {project.description}
+                          </p>
+                        </div>
+                      </a>
+                    )
+                  })}
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4 pt-2">
+                    {tutorials.map((tutorial) => {
+                      const isLive = !!tutorial.link && tutorial.status !== "coming-soon"
+
+                      return (
+                        <button
+                          key={tutorial.id}
+                          onClick={() => isLive && setSelectedTutorial(tutorial)}
+                          disabled={!isLive}
+                          className={`block w-full rounded-xl border-2 border-white/15 bg-white/5 p-5 text-left transition-all duration-300 ${
+                            isLive
+                              ? "cursor-pointer hover:border-white/40 hover:bg-white/10"
+                              : "cursor-default opacity-90"
+                          }`}
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="space-y-2">
+                              <h3 className="text-base font-semibold uppercase tracking-tight text-white sm:text-lg">
+                                {tutorial.title}
+                              </h3>
+                              <p className="text-sm text-white/70">{tutorial.description}</p>
+                            </div>
+
+                            <p className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-white/60 sm:mt-0">
+                              {isLive ? "Open Tutorial" : "Coming Soon"}
+                            </p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
+                    <DialogContent 
+                      showCloseButton={false}
+                      className="!max-w-5xl w-[90vw] !max-h-[85vh] h-[85vh] p-0 bg-black border-white/20 sm:!max-w-5xl"
+                    >
+                      <button
+                        onClick={() => setSelectedTutorial(null)}
+                        className="absolute top-20 right-6 z-50 rounded-xs bg-black/80 hover:bg-black/90 text-white opacity-70 hover:opacity-100 p-2 transition-opacity focus:outline-none focus:ring-2 focus:ring-white/50"
+                        aria-label="Close"
+                      >
+                        <svg
+                          className="h-5 w-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                      {selectedTutorial?.link && (
                         <iframe
-                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&start=${startTime}`}
-                          className="absolute inset-0 w-full h-full"
-                          allow="autoplay; encrypted-media"
+                          src={selectedTutorial.link}
+                          width="100%"
+                          height="100%"
+                          className="w-full h-full rounded-lg"
                           allowFullScreen
-                          title={project.title}
-                        />
-                      ) : (
-                        <Image
-                          src={project.image || "/placeholder.svg"}
-                          alt={project.title}
-                          width={600}
-                          height={400}
-                          className="h-full w-full object-contain transition-all duration-300"
+                          style={{ border: "none" }}
                         />
                       )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
-                        {project.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-white/60 transition-colors duration-500">{project.description}</p>
-                    </div>
-                  </a>
-                )
-              })}
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
             </div>
           </div>
         </div>
