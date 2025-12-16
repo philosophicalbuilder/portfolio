@@ -206,7 +206,7 @@ export default function Home() {
           <div className="space-y-6">
             <div className="h-48 w-48 overflow-hidden rounded-full border-2 border-white transition-colors duration-500 md:h-64 md:w-64">
               <Image
-                src="/profile.jpg"
+                src="/profile.jpeg"
                 alt="Profile"
                 width={256}
                 height={256}
