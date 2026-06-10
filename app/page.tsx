@@ -1,8 +1,9 @@
 "use client"
 
 import Image from "next/image"
-import { ExternalLink } from "lucide-react"
-import { useState } from "react"
+import { ExternalLink, Play, Square } from "lucide-react"
+import { useCallback, useEffect, useState } from "react"
+import useEmblaCarousel from "embla-carousel-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 // Helper function to extract YouTube video ID from URL
@@ -56,6 +57,75 @@ type Publication = {
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "publications">("projects")
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
+  const [isSongPlaying, setIsSongPlaying] = useState(false)
+
+  // Swipeable section pager — slides sync with the tab pills
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start" })
+  const sectionOrder: ("projects" | "publications" | "tutorials")[] = ["projects", "publications", "tutorials"]
+
+  useEffect(() => {
+    if (!emblaApi) return
+    const onSelect = () => {
+      const sections = ["projects", "publications", "tutorials"] as const
+      setActiveTab(sections[emblaApi.selectedScrollSnap()])
+    }
+    emblaApi.on("select", onSelect)
+    return () => {
+      emblaApi.off("select", onSelect)
+    }
+  }, [emblaApi])
+
+  const goToSection = useCallback(
+    (tab: "projects" | "publications" | "tutorials") => {
+      setActiveTab(tab)
+      emblaApi?.scrollTo(sectionOrder.indexOf(tab))
+    },
+    [emblaApi],
+  )
+
+  // Plays the song through the YouTube IFrame API so we can lower the volume
+  useEffect(() => {
+    if (!isSongPlaying) return
+
+    let player: any
+    let cancelled = false
+
+    const createPlayer = () => {
+      if (cancelled) return
+      player = new (window as any).YT.Player("song-player", {
+        videoId: "vTHtvnUBKAw",
+        playerVars: { autoplay: 1, start: 251 },
+        events: {
+          onReady: (e: any) => {
+            e.target.setVolume(25)
+            e.target.playVideo()
+          },
+        },
+      })
+    }
+
+    const w = window as any
+    if (w.YT?.Player) {
+      createPlayer()
+    } else {
+      const existing = document.querySelector('script[src="https://www.youtube.com/iframe_api"]')
+      if (!existing) {
+        const tag = document.createElement("script")
+        tag.src = "https://www.youtube.com/iframe_api"
+        document.head.appendChild(tag)
+      }
+      const prev = w.onYouTubeIframeAPIReady
+      w.onYouTubeIframeAPIReady = () => {
+        prev?.()
+        createPlayer()
+      }
+    }
+
+    return () => {
+      cancelled = true
+      player?.destroy?.()
+    }
+  }, [isSongPlaying])
 
   const projects: Project[] = [
     {
@@ -272,6 +342,45 @@ export default function Home() {
                     <p className="text-sm text-white/70 transition-colors duration-500">Quantum Researcher</p>
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsSongPlaying((playing) => !playing)}
+                  className="group flex w-full items-center gap-4 rounded-xl border-2 border-white/15 bg-white/5 p-4 text-left transition-all duration-300 hover:border-white/40 hover:bg-white/10"
+                >
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all duration-300 group-hover:bg-white group-hover:text-black">
+                    {isSongPlaying ? (
+                      <Square className="h-4 w-4 fill-current" />
+                    ) : (
+                      <Play className="ml-0.5 h-5 w-5 fill-current" />
+                    )}
+                  </span>
+                  <span className="flex-1">
+                    <span className="block text-sm font-bold uppercase tracking-wider text-white">
+                      {isSongPlaying ? "Now Playing" : "Play Me"}
+                    </span>
+                    <span className="block text-xs text-white/60">
+                      {isSongPlaying ? "Maironis — Nine" : "A track worth a listen"}
+                    </span>
+                  </span>
+                  {isSongPlaying ? (
+                    <span className="flex h-4 items-end gap-[3px]" aria-hidden>
+                      <span className="w-[3px] rounded-full bg-white [animation:equalizer_0.9s_ease-in-out_infinite]" />
+                      <span className="w-[3px] rounded-full bg-white [animation:equalizer_0.9s_ease-in-out_0.3s_infinite]" />
+                      <span className="w-[3px] rounded-full bg-white [animation:equalizer_0.9s_ease-in-out_0.6s_infinite]" />
+                    </span>
+                  ) : (
+                    <span className="relative flex h-2.5 w-2.5" aria-hidden>
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-60" />
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-white" />
+                    </span>
+                  )}
+                </button>
+                {isSongPlaying && (
+                  <div className="pointer-events-none fixed -left-[9999px] h-px w-px overflow-hidden opacity-0">
+                    <div id="song-player" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -291,7 +400,7 @@ export default function Home() {
                 <div className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 p-1 text-xs font-medium uppercase tracking-wide text-white/60">
                   <button
                     type="button"
-                    onClick={() => setActiveTab("projects")}
+                    onClick={() => goToSection("projects")}
                     className={`rounded-full px-3 py-1 transition-all duration-200 ${
                       activeTab === "projects"
                         ? "bg-white text-black shadow-sm"
@@ -302,7 +411,7 @@ export default function Home() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveTab("publications")}
+                    onClick={() => goToSection("publications")}
                     className={`rounded-full px-3 py-1 transition-all duration-200 ${
                       activeTab === "publications"
                         ? "bg-white text-black shadow-sm"
@@ -313,7 +422,7 @@ export default function Home() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveTab("tutorials")}
+                    onClick={() => goToSection("tutorials")}
                     className={`rounded-full px-3 py-1 transition-all duration-200 ${
                       activeTab === "tutorials"
                         ? "bg-white text-black shadow-sm"
@@ -325,183 +434,190 @@ export default function Home() {
                 </div>
               </div>
 
-              {activeTab === "publications" ? (
-                <div className="space-y-12 py-8">
-                  {publications.map((publication) => (
-                    <div
-                      key={publication.id}
-                      className="grid items-start gap-10 lg:grid-cols-[minmax(0,520px)_1fr]"
-                    >
-                      <div className="h-[65vh] space-y-4 overflow-y-auto rounded-lg">
-                        {Array.from({ length: publication.pageCount }, (_, i) => (
-                          <Image
-                            key={i}
-                            src={`${publication.pagesPath}/page-${i + 1}.jpg`}
-                            alt={`${publication.title} — page ${i + 1}`}
-                            width={1200}
-                            height={1553}
-                            className="w-full rounded-lg shadow-2xl"
-                            priority={i === 0}
-                          />
-                        ))}
-                      </div>
+              <div ref={emblaRef} className="cursor-grab overflow-hidden active:cursor-grabbing">
+                <div className="-ml-8 flex items-start">
+                  {/* Slide 1: Projects */}
+                  <div className="min-w-0 flex-[0_0_100%] pl-8">
+                    <div className="grid gap-6 pt-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                      {projects.map((project) => {
+                        const isYouTube = isYouTubeUrl(project.link)
+                        const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
+                        // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
+                        const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
+                        const shouldShowVideo = isYouTube && videoId
 
-                      <div className="space-y-4">
-                        <p className="text-xs font-bold uppercase tracking-wider text-white/50">
-                          Publication
-                        </p>
-                        <h3 className="text-2xl font-bold uppercase leading-snug tracking-tight text-white lg:text-3xl">
-                          {publication.title}
-                        </h3>
-                        <p className="text-sm font-medium text-white/80">{publication.authors}</p>
-                        <p className="text-xs uppercase tracking-wide text-white/50">{publication.venue}</p>
-                        <p className="text-base leading-relaxed text-white/70">{publication.description}</p>
-
-                        <div className="grid grid-cols-2 gap-4 pt-2">
-                          <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
-                            <Image
-                              src="/publications/figure-a.png"
-                              alt="Auxiliary potentials of the factorization chain near the potential minimum"
-                              fill
-                              className="object-contain p-2"
-                            />
-                          </div>
-                          <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
-                            <Image
-                              src="/publications/figure-b.png"
-                              alt="Auxiliary potentials of the factorization chain over the full range"
-                              fill
-                              className="object-contain p-2"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : activeTab === "projects" ? (
-                <div className="overflow-x-auto pt-2 min-[1710px]:overflow-x-visible">
-                  <div className="grid w-max min-w-full gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(3,406px)]">
-                  {projects.map((project) => {
-                    const isYouTube = isYouTubeUrl(project.link)
-                    const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
-                    // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
-                    const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
-                    const shouldShowVideo = isYouTube && videoId
-
-                    return (
-                      <a
-                        key={project.id}
-                        href={project.link}
-                        target={project.link ? "_blank" : undefined}
-                        rel={project.link ? "noopener noreferrer" : undefined}
-                        className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
-                      >
-                        <div className="relative aspect-video overflow-hidden bg-black">
-                          {shouldShowVideo ? (
-                            <iframe
-                              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&start=${startTime}`}
-                              className="absolute inset-0 h-full w-full"
-                              allow="autoplay; encrypted-media"
-                              allowFullScreen
-                              title={project.title}
-                            />
-                          ) : (
-                            <Image
-                              src={project.image || "/placeholder.svg"}
-                              alt={project.title}
-                              width={600}
-                              height={400}
-                              className="h-full w-full object-contain transition-all duration-300"
-                            />
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
-                            {project.title}
-                          </h3>
-                          <p className="mt-1 text-sm text-white/60 transition-colors duration-500">
-                            {project.description}
-                          </p>
-                        </div>
-                      </a>
-                    )
-                  })}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-4 pt-2">
-                    {tutorials.map((tutorial) => {
-                      const isLive = !!tutorial.link && tutorial.status !== "coming-soon"
-
-                      return (
-                        <button
-                          key={tutorial.id}
-                          onClick={() => isLive && setSelectedTutorial(tutorial)}
-                          disabled={!isLive}
-                          className={`block w-full rounded-xl border-2 border-white/15 bg-white/5 p-5 text-left transition-all duration-300 ${
-                            isLive
-                              ? "cursor-pointer hover:border-white/40 hover:bg-white/10"
-                              : "cursor-default opacity-90"
-                          }`}
-                        >
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="space-y-2">
-                              <h3 className="text-base font-semibold uppercase tracking-tight text-white sm:text-lg">
-                                {tutorial.title}
-                              </h3>
-                              <p className="text-sm text-white/70">{tutorial.description}</p>
+                        return (
+                          <a
+                            key={project.id}
+                            href={project.link}
+                            target={project.link ? "_blank" : undefined}
+                            rel={project.link ? "noopener noreferrer" : undefined}
+                            className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
+                          >
+                            <div className="relative aspect-video overflow-hidden bg-black">
+                              {shouldShowVideo ? (
+                                <iframe
+                                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&modestbranding=1&rel=0&playsinline=1&enablejsapi=1&start=${startTime}`}
+                                  className="absolute inset-0 h-full w-full"
+                                  allow="autoplay; encrypted-media"
+                                  allowFullScreen
+                                  title={project.title}
+                                />
+                              ) : (
+                                <Image
+                                  src={project.image || "/placeholder.svg"}
+                                  alt={project.title}
+                                  width={600}
+                                  height={400}
+                                  className="h-full w-full object-contain transition-all duration-300"
+                                />
+                              )}
                             </div>
-
-                            <p className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-white/60 sm:mt-0">
-                              {isLive ? "Open Tutorial" : "Coming Soon"}
-                            </p>
-                          </div>
-                        </button>
-                      )
-                    })}
+                            <div className="p-4">
+                              <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
+                                {project.title}
+                              </h3>
+                              <p className="mt-1 text-sm text-white/60 transition-colors duration-500">
+                                {project.description}
+                              </p>
+                            </div>
+                          </a>
+                        )
+                      })}
+                    </div>
                   </div>
 
-                  <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
-                    <DialogContent 
-                      showCloseButton={false}
-                      className="!max-w-5xl w-[90vw] !max-h-[85vh] h-[85vh] p-0 bg-black border-white/20 sm:!max-w-5xl"
-                    >
-                      <button
-                        onClick={() => setSelectedTutorial(null)}
-                        className="absolute top-20 right-6 z-50 rounded-xs bg-black/80 hover:bg-black/90 text-white opacity-70 hover:opacity-100 p-2 transition-opacity focus:outline-none focus:ring-2 focus:ring-white/50"
-                        aria-label="Close"
-                      >
-                        <svg
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
+                  {/* Slide 2: Publications */}
+                  <div className="min-w-0 flex-[0_0_100%] pl-8">
+                    <div className="space-y-12 py-8">
+                      {publications.map((publication) => (
+                        <div
+                          key={publication.id}
+                          className="grid items-start gap-10 lg:grid-cols-[minmax(0,520px)_1fr]"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                      {selectedTutorial?.link && (
-                        <iframe
-                          src={selectedTutorial.link}
-                          width="100%"
-                          height="100%"
-                          className="w-full h-full rounded-lg"
-                          allowFullScreen
-                          style={{ border: "none" }}
-                        />
-                      )}
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
+                          <div className="h-[65vh] space-y-4 overflow-y-auto rounded-lg">
+                            {Array.from({ length: publication.pageCount }, (_, i) => (
+                              <Image
+                                key={i}
+                                src={`${publication.pagesPath}/page-${i + 1}.jpg`}
+                                alt={`${publication.title} — page ${i + 1}`}
+                                width={1200}
+                                height={1553}
+                                className="w-full rounded-lg shadow-2xl"
+                                priority={i === 0}
+                              />
+                            ))}
+                          </div>
+
+                          <div className="space-y-4">
+                            <p className="text-xs font-bold uppercase tracking-wider text-white/50">
+                              Publication
+                            </p>
+                            <h3 className="text-2xl font-bold uppercase leading-snug tracking-tight text-white lg:text-3xl">
+                              {publication.title}
+                            </h3>
+                            <p className="text-sm font-medium text-white/80">{publication.authors}</p>
+                            <p className="text-xs uppercase tracking-wide text-white/50">{publication.venue}</p>
+                            <p className="text-base leading-relaxed text-white/70">{publication.description}</p>
+
+                            <div className="grid grid-cols-2 gap-4 pt-2">
+                              <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
+                                <Image
+                                  src="/publications/figure-a.png"
+                                  alt="Auxiliary potentials of the factorization chain near the potential minimum"
+                                  fill
+                                  className="object-contain p-2"
+                                />
+                              </div>
+                              <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
+                                <Image
+                                  src="/publications/figure-b.png"
+                                  alt="Auxiliary potentials of the factorization chain over the full range"
+                                  fill
+                                  className="object-contain p-2"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Slide 3: Written Tutorials */}
+                  <div className="min-w-0 flex-[0_0_100%] pl-8">
+                    <div className="space-y-4 pt-2">
+                      {tutorials.map((tutorial) => {
+                        const isLive = !!tutorial.link && tutorial.status !== "coming-soon"
+
+                        return (
+                          <button
+                            key={tutorial.id}
+                            onClick={() => isLive && setSelectedTutorial(tutorial)}
+                            disabled={!isLive}
+                            className={`block w-full rounded-xl border-2 border-white/15 bg-white/5 p-5 text-left transition-all duration-300 ${
+                              isLive
+                                ? "cursor-pointer hover:border-white/40 hover:bg-white/10"
+                                : "cursor-default opacity-90"
+                            }`}
+                          >
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                              <div className="space-y-2">
+                                <h3 className="text-base font-semibold uppercase tracking-tight text-white sm:text-lg">
+                                  {tutorial.title}
+                                </h3>
+                                <p className="text-sm text-white/70">{tutorial.description}</p>
+                              </div>
+
+                              <p className="mt-1 whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-white/60 sm:mt-0">
+                                {isLive ? "Open Tutorial" : "Coming Soon"}
+                              </p>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
+                <DialogContent 
+                  showCloseButton={false}
+                  className="!max-w-5xl w-[90vw] !max-h-[85vh] h-[85vh] p-0 bg-black border-white/20 sm:!max-w-5xl"
+                >
+                  <button
+                    onClick={() => setSelectedTutorial(null)}
+                    className="absolute top-20 right-6 z-50 rounded-xs bg-black/80 hover:bg-black/90 text-white opacity-70 hover:opacity-100 p-2 transition-opacity focus:outline-none focus:ring-2 focus:ring-white/50"
+                    aria-label="Close"
+                  >
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  {selectedTutorial?.link && (
+                    <iframe
+                      src={selectedTutorial.link}
+                      width="100%"
+                      height="100%"
+                      className="w-full h-full rounded-lg"
+                      allowFullScreen
+                      style={{ border: "none" }}
+                    />
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </div>

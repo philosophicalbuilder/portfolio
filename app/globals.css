@@ -128,3 +128,14 @@
     text-wrap: pretty;
   }
 }
+
+/* Equalizer bars for the now-playing indicator */
+@keyframes equalizer {
+  0%,
+  100% {
+    height: 30%;
+  }
+  50% {
+    height: 100%;
+  }
+}
