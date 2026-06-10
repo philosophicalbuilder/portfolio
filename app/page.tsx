@@ -43,14 +43,18 @@ type Tutorial = {
   status?: "live" | "coming-soon"
 }
 
-type Video = {
+type Publication = {
   id: number
   title: string
-  link: string
+  authors: string
+  venue: string
+  description: string
+  pagesPath: string
+  pageCount: number
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "videos">("projects")
+  const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "publications">("projects")
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
 
   const projects: Project[] = [
@@ -68,15 +72,15 @@ export default function Home() {
       description:
         "The Frontier Project is founded on the idea that Science is the endless frontier. This is a personal project of mine that serves as a unified platform for researchers to collaborate, share findings, and join labs. There is currently nothing like Frontier - and the University of Virginia is launching pilots to stress test the platform. Exciting!",
       image: "/projects/frontier-project.jpg",
-      link: "https://youtu.be/rbuvAWgwN6A",
+      link: "https://www.youtube.com/watch?v=gWKjHJtEhdk&t=54s",
     },
     {
       id: 3,
-      title: '"Circle 2" AI Desktop Assistant',
+      title: "MADI: Team Matching",
       description:
-        'Circle 2 is a desktop prototype where users can ask about their desktop screen - such as "where can I find heading 2 on Google Docs", or "How do I access my terminal on VS Code?" and a phantom cursor takes over for you.',
-      image: "/projects/circle-2-assistant.png",
-      link: "https://youtu.be/3ATmEhXXDpg",
+        "A demo of MADI's team matching workflow — connecting NASA researchers and innovators with the right teams and expertise across the agency, designed and shipped as part of my work on MADI.",
+      image: "/projects/madi-project.jpg",
+      link: "https://www.youtube.com/watch?v=8TaQt-Oj5WY",
     },
     {
       id: 4,
@@ -84,7 +88,23 @@ export default function Home() {
       description:
         '"Yet Another LLM" (YAL) is an LLM assistant that helps buyers across the full lifecycle of an online purchase. "Can you find a yellow dress with roses for less than $50?"',
       image: "/projects/yal-project.png",
-      link: "https://www.youtube.com/watch?v=Loir7tDrp7Y&t=114s",
+      link: "https://www.youtube.com/watch?v=hR6qRgXKZIw&t=569s",
+    },
+    {
+      id: 5,
+      title: "Activity Select",
+      description:
+        "A walkthrough of the Activity Selection problem — a classic greedy algorithm for scheduling the maximum number of non-overlapping activities.",
+      image: "/placeholder.svg",
+      link: "https://www.youtube.com/watch?v=YiETlgZUeUA",
+    },
+    {
+      id: 6,
+      title: "Kruskal's algorithm",
+      description:
+        "An explanation of Kruskal's algorithm for finding a minimum spanning tree in a weighted graph using a greedy edge-selection approach.",
+      image: "/placeholder.svg",
+      link: "https://www.youtube.com/watch?v=whB7UjMMSD4&t=686s",
     },
   ]
 
@@ -131,79 +151,24 @@ export default function Home() {
     },
   ]
 
-  const videos: Video[] = [
+  const publications: Publication[] = [
     {
       id: 1,
-      title: "Video 1",
-      link: "https://www.youtube.com/watch?v=j4QLEQyCwwI&t=308s",
-    },
-    {
-      id: 2,
-      title: "Video 2",
-      link: "https://www.youtube.com/watch?v=pbjniFi3O04&t=1321s",
-    },
-    {
-      id: 3,
-      title: "Video 3",
-      link: "https://www.youtube.com/watch?v=uTdU450oHS4&t=884s",
-    },
-    {
-      id: 4,
-      title: "Video 4",
-      link: "https://www.youtube.com/watch?v=JR7jSYWzrmc&t=5317s",
-    },
-    {
-      id: 5,
-      title: "Video 5",
-      link: "https://www.youtube.com/watch?v=jv02kCUqr7o&t=810s",
-    },
-    {
-      id: 6,
-      title: "Video 6",
-      link: "https://www.youtube.com/watch?v=Rnt2O64WnbE&t=455s",
-    },
-    {
-      id: 7,
-      title: "Video 7",
-      link: "https://www.youtube.com/watch?v=x_AwYOHLtyU&t=806s",
-    },
-    {
-      id: 8,
-      title: "Video 8",
-      link: "https://www.youtube.com/watch?v=hTjTfqzjeGY&t=137s",
-    },
-    {
-      id: 9,
-      title: "Video 9",
-      link: "https://www.youtube.com/watch?v=7H-Xki7-h_0&t=885s",
-    },
-    {
-      id: 10,
-      title: "Video 10",
-      link: "https://www.youtube.com/watch?v=aGwJTTq471I",
-    },
-    {
-      id: 11,
-      title: "Video 11",
-      link: "https://www.youtube.com/watch?v=AqWTtpKlV_g&t=389s",
-    },
-    {
-      id: 12,
-      title: "Video 12",
-      link: "https://www.youtube.com/watch?v=2EUS24ViJ40&t=887s",
-    },
-    {
-      id: 13,
-      title: "Video 13",
-      link: "https://www.youtube.com/watch?v=VsSuoUhOHPY&t=665s",
+      title: "Schrödinger factorization chain for a system displaying broken supersymmetry",
+      authors: "Bennett Lamb, Ramkrishna Sharma, Luogen Xu, and James K. Freericks",
+      venue: "University of Virginia & Georgetown University",
+      description:
+        "Schrödinger's factorization method solves for energy eigenstates algebraically, and Witten later generalized it to supersymmetric quantum mechanics. A common misconception holds that supersymmetry-breaking potentials have Hamiltonians that cannot be factorized into a factorization chain. In this work, we show they can — supersymmetry breaking is a property of the superpotential, not the potential — and we provide a numerical method to construct the factorization chain for any well-behaved one-dimensional potential.",
+      pagesPath: "/publications/pages",
+      pageCount: 11,
     },
   ]
 
   return (
-    <div className="min-h-screen bg-black p-6 transition-colors duration-500 md:p-8 lg:p-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-8 md:grid-cols-[300px_1fr] lg:gap-12">
-          <div className="space-y-6">
+    <div className="min-h-screen bg-black p-6 transition-colors duration-500 md:p-8 lg:p-8 min-[1710px]:lg:p-12">
+      <div className="mx-auto w-full max-w-none min-[1710px]:max-w-[1710px]">
+        <div className="grid gap-8 min-[1710px]:grid-cols-[300px_1fr] lg:gap-12">
+          <div className="flex flex-col gap-6">
             <div className="h-48 w-48 overflow-hidden rounded-full border-2 border-white transition-colors duration-500 md:h-64 md:w-64">
               <Image
                 src="/profile.jpeg"
@@ -233,21 +198,12 @@ export default function Home() {
               </a>
             </div>
 
-            <p className="text-base leading-relaxed text-justify text-white/80 transition-colors duration-500">
-              I'm a UVA CS student bridging the gap between code and design. Whether founding platforms like The
-              Frontier Project or prototyping new tools, I translate dense data into intuitive products that empower
-              users. Off-screen, I love doing charcoal sketches, tutoring students, and serving as the dedicated support
-              staff for Chuchu, my 9-year-old golden retriever.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            <div>
+            <div className="flex flex-1 flex-col">
               <h2 className="text-xs font-bold uppercase tracking-wider text-white/60 transition-colors duration-500 mb-4">
-                EXPERIENCE
+                Where I've Been
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-                <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-1 flex-col justify-between gap-5">
+                <div className="flex items-center gap-4">
                   <Image
                     src="/logos/nasa-logo.png"
                     alt="NASA"
@@ -255,11 +211,13 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">NASA</p>
-                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Product Designer and PM</p>
+                  <div>
+                    <p className="text-base font-bold text-white transition-colors duration-500">NASA</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Product Designer and PM</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Image
                     src="/logos/mit-logo.png"
                     alt="MIT"
@@ -267,11 +225,13 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">MIT</p>
-                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Policy Analyst</p>
+                  <div>
+                    <p className="text-base font-bold text-white transition-colors duration-500">MIT</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Policy Analyst</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Image
                     src="/logos/nsf-logo.png"
                     alt="NSF"
@@ -279,11 +239,13 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">NSF</p>
-                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Data Science Intern</p>
+                  <div>
+                    <p className="text-base font-bold text-white transition-colors duration-500">NSF</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Data Science Intern</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Image
                     src="/logos/gt-logo.png"
                     alt="Georgia Tech"
@@ -291,11 +253,13 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">Georgia Tech</p>
-                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Product Manager</p>
+                  <div>
+                    <p className="text-base font-bold text-white transition-colors duration-500">Georgia Tech</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Product Manager</p>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Image
                     src="/logos/georgetown-logo.png"
                     alt="Georgetown University"
@@ -303,12 +267,16 @@ export default function Home() {
                     height={64}
                     className="h-16 w-16 object-contain"
                   />
-                  <p className="text-xs font-bold text-white text-center transition-colors duration-500">Georgetown</p>
-                  <p className="text-xs text-white/70 text-center transition-colors duration-500">Quantum Researcher</p>
+                  <div>
+                    <p className="text-base font-bold text-white transition-colors duration-500">Georgetown</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Quantum Researcher</p>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
+          <div className="space-y-6">
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -316,7 +284,7 @@ export default function Home() {
                     WORK
                   </h2>
                   <p className="mt-2 text-sm text-white/60 transition-colors duration-500">
-                    Toggle between shipped projects, written deep-dives, and videos.
+                    Toggle between shipped projects, publications, and written deep-dives.
                   </p>
                 </div>
 
@@ -334,14 +302,14 @@ export default function Home() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveTab("videos")}
+                    onClick={() => setActiveTab("publications")}
                     className={`rounded-full px-3 py-1 transition-all duration-200 ${
-                      activeTab === "videos"
+                      activeTab === "publications"
                         ? "bg-white text-black shadow-sm"
                         : "text-white/60 hover:bg-white/10"
                     }`}
                   >
-                    Videos
+                    Publications
                   </button>
                   <button
                     type="button"
@@ -357,61 +325,69 @@ export default function Home() {
                 </div>
               </div>
 
-              {activeTab === "videos" ? (
-                <div className="grid gap-6 pt-2 sm:grid-cols-2">
-                  {videos.map((video) => {
-                    const videoId = getYouTubeVideoId(video.link)
+              {activeTab === "publications" ? (
+                <div className="space-y-12 py-8">
+                  {publications.map((publication) => (
+                    <div
+                      key={publication.id}
+                      className="grid items-start gap-10 lg:grid-cols-[minmax(0,520px)_1fr]"
+                    >
+                      <div className="h-[65vh] space-y-4 overflow-y-auto rounded-lg">
+                        {Array.from({ length: publication.pageCount }, (_, i) => (
+                          <Image
+                            key={i}
+                            src={`${publication.pagesPath}/page-${i + 1}.jpg`}
+                            alt={`${publication.title} — page ${i + 1}`}
+                            width={1200}
+                            height={1553}
+                            className="w-full rounded-lg shadow-2xl"
+                            priority={i === 0}
+                          />
+                        ))}
+                      </div>
 
-                    return (
-                      <a
-                        key={video.id}
-                        href={video.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
-                      >
-                        <div className="relative aspect-video overflow-hidden bg-black">
-                          {videoId && (
-                            <>
-                              <Image
-                                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
-                                alt={video.title}
-                                width={640}
-                                height={360}
-                                className="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-75"
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-all duration-300 group-hover:bg-black/10">
-                                <div className="rounded-full bg-white/90 p-4 transition-transform duration-300 group-hover:scale-110">
-                                  <svg
-                                    className="h-8 w-8 text-black"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path d="M8 5v14l11-7z" />
-                                  </svg>
-                                </div>
-                              </div>
-                            </>
-                          )}
+                      <div className="space-y-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-white/50">
+                          Publication
+                        </p>
+                        <h3 className="text-2xl font-bold uppercase leading-snug tracking-tight text-white lg:text-3xl">
+                          {publication.title}
+                        </h3>
+                        <p className="text-sm font-medium text-white/80">{publication.authors}</p>
+                        <p className="text-xs uppercase tracking-wide text-white/50">{publication.venue}</p>
+                        <p className="text-base leading-relaxed text-white/70">{publication.description}</p>
+
+                        <div className="grid grid-cols-2 gap-4 pt-2">
+                          <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
+                            <Image
+                              src="/publications/figure-a.png"
+                              alt="Auxiliary potentials of the factorization chain near the potential minimum"
+                              fill
+                              className="object-contain p-2"
+                            />
+                          </div>
+                          <div className="relative aspect-[3/2] overflow-hidden rounded-lg bg-white p-2 shadow-2xl">
+                            <Image
+                              src="/publications/figure-b.png"
+                              alt="Auxiliary potentials of the factorization chain over the full range"
+                              fill
+                              className="object-contain p-2"
+                            />
+                          </div>
                         </div>
-                        <div className="p-4">
-                          <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
-                            {video.title}
-                          </h3>
-                        </div>
-                      </a>
-                    )
-                  })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : activeTab === "projects" ? (
-                <div className="grid gap-6 pt-2 sm:grid-cols-2">
+                <div className="overflow-x-auto pt-2 min-[1710px]:overflow-x-visible">
+                  <div className="grid w-max min-w-full gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(3,406px)]">
                   {projects.map((project) => {
                     const isYouTube = isYouTubeUrl(project.link)
                     const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
                     // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
                     const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
-                    // YAL project (id 4) should show static image, not autoplay video
-                    const shouldShowVideo = isYouTube && videoId && project.id !== 4
+                    const shouldShowVideo = isYouTube && videoId
 
                     return (
                       <a
@@ -451,6 +427,7 @@ export default function Home() {
                       </a>
                     )
                   })}
+                  </div>
                 </div>
               ) : (
                 <>

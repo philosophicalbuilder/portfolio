@@ -13,8 +13,10 @@ const inter = Inter({
   display: "swap",
 })
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://portfolio-ramkrishna.vercel.app'
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://your-vercel-url.vercel.app'),
+  metadataBase: new URL(siteUrl),
   title: "Ramkrishna's Portfolio Website",
   description:
     "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
@@ -32,16 +34,16 @@ export const metadata: Metadata = {
   authors: [{ name: "Ramkrishna Sharma" }],
   creator: "Ramkrishna Sharma",
   openGraph: {
-    type: "profile",
+    type: "website",
     locale: "en_US",
-    url: "https://github.com/philosophicalbuilder/portfolio",
-    title: "Ramkrishna's Portfolio Website",
+    url: siteUrl,
+    title: "Ramkrishna Sharma - Portfolio",
     description:
       "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT. Building AI-driven interfaces and collaborative research tools.",
     siteName: "Ramkrishna's Portfolio",
     images: [
       {
-        url: "/opengraph-image",
+        url: `${siteUrl}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: "Ramkrishna Sharma - Portfolio",
@@ -50,9 +52,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ramkrishna's Portfolio Website",
+    title: "Ramkrishna Sharma - Portfolio",
     description: "Computer Science student at the University of Virginia. Product Designer and PM at NASA, Policy Analyst at MIT.",
-    images: ["/opengraph-image"],
+    images: [`${siteUrl}/opengraph-image`],
   },
   robots: {
     index: true,
@@ -93,7 +95,7 @@ export default function RootLayout({
               "@type": "Person",
               name: "Ramkrishna Sharma",
               url: "https://github.com/philosophicalbuilder/portfolio",
-              image: "/profile.jpg",
+              image: `${siteUrl}/profile.jpeg`,
               sameAs: [
                 "https://www.youtube.com/@TheInnovationLabx",
               ],
