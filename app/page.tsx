@@ -1,9 +1,10 @@
 "use client"
 
 import Image from "next/image"
-import { ExternalLink, Play, Square } from "lucide-react"
+import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Maximize2, Minimize2, Play, Square } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import useEmblaCarousel from "embla-carousel-react"
+import { AnimatePresence, motion } from "framer-motion"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 // Helper function to extract YouTube video ID from URL
@@ -58,6 +59,32 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "publications">("projects")
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
   const [isSongPlaying, setIsSongPlaying] = useState(false)
+  const [enlargedProjectId, setEnlargedProjectId] = useState<number | null>(null)
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+
+  const galleryPhotos: { src: string; alt: string }[] = [
+    { src: "/gallery/nasa-worm.jpg", alt: "With the team at the NASA worm sculpture" },
+    { src: "/gallery/nasa-hq.jpg", alt: "Badge in hand at NASA Headquarters" },
+    { src: "/gallery/speaking.jpg", alt: "Speaking at a Virginia event" },
+    { src: "/gallery/team.jpg", alt: "With my research cohort" },
+    { src: "/gallery/fbi-badge.jpg", alt: "UVA/MIT FBI STB intern badge" },
+    { src: "/gallery/panel.jpg", alt: "On a roundtable panel" },
+    { src: "/gallery/eeob.jpg", alt: "Eisenhower Executive Office Building" },
+    { src: "/gallery/pool.jpg", alt: "Lining up a shot at the pool table" },
+  ]
+
+  // Sliding gallery — one photo per slide
+  const [galleryEmblaRef, galleryEmblaApi] = useEmblaCarousel({ loop: true })
+  const [gallerySlide, setGallerySlide] = useState(0)
+
+  useEffect(() => {
+    if (!galleryEmblaApi) return
+    const onSelect = () => setGallerySlide(galleryEmblaApi.selectedScrollSnap())
+    galleryEmblaApi.on("select", onSelect)
+    return () => {
+      galleryEmblaApi.off("select", onSelect)
+    }
+  }, [galleryEmblaApi])
 
   // Swipeable section pager — slides sync with the tab pills
   const [emblaRef, emblaApi] = useEmblaCarousel({ align: "start" })
@@ -94,7 +121,7 @@ export default function Home() {
       if (cancelled) return
       player = new (window as any).YT.Player("song-player", {
         videoId: "vTHtvnUBKAw",
-        playerVars: { autoplay: 1, start: 253 },
+        playerVars: { autoplay: 1, start: 254 },
         events: {
           onReady: (e: any) => {
             e.target.setVolume(25)
@@ -434,25 +461,50 @@ export default function Home() {
                 </div>
               </div>
 
+              <motion.div
+                animate={{
+                  height: isGalleryOpen ? 0 : "auto",
+                  opacity: isGalleryOpen ? 0 : 1,
+                  y: isGalleryOpen ? -32 : 0,
+                }}
+                transition={{ duration: 0.65, ease: [0.32, 0.72, 0, 1] }}
+                className={`overflow-hidden ${isGalleryOpen ? "pointer-events-none" : ""}`}
+              >
               <div ref={emblaRef} className="cursor-grab overflow-hidden active:cursor-grabbing">
                 <div className="-ml-8 flex items-start">
                   {/* Slide 1: Projects */}
                   <div className="min-w-0 flex-[0_0_100%] pl-8">
-                    <div className="grid gap-6 pt-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="flex flex-wrap gap-6 pt-2">
                       {projects.map((project) => {
                         const isYouTube = isYouTubeUrl(project.link)
                         const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
                         // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
                         const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
                         const shouldShowVideo = isYouTube && videoId
+                        const isEnlarged = enlargedProjectId === project.id
+                        const isDocked = enlargedProjectId !== null && !isEnlarged
 
                         return (
-                          <a
+                          <motion.a
                             key={project.id}
+                            layout
+                            animate={{ opacity: isDocked ? 0 : 1 }}
+                            whileHover={enlargedProjectId === null ? { scale: 1.02 } : undefined}
+                            transition={{
+                              layout: { duration: 0.65, ease: [0.32, 0.72, 0, 1] },
+                              opacity: { duration: 0.4, ease: "easeOut" },
+                              scale: { duration: 0.3, ease: "easeOut" },
+                            }}
                             href={project.link}
                             target={project.link ? "_blank" : undefined}
                             rel={project.link ? "noopener noreferrer" : undefined}
-                            className="group cursor-pointer overflow-hidden rounded-lg border-2 border-white/20 bg-white/5 transition-all duration-300 hover:scale-[1.02]"
+                            className={`group cursor-pointer overflow-hidden rounded-lg border-2 bg-white/5 transition-colors duration-500 ${
+                              isEnlarged
+                                ? "order-first w-full border-white/20"
+                                : isDocked
+                                  ? "pointer-events-none -my-3 h-0 w-0 border-transparent"
+                                  : "w-full border-white/20 sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]"
+                            }`}
                           >
                             <div className="relative aspect-video overflow-hidden bg-black">
                               {shouldShowVideo ? (
@@ -473,15 +525,33 @@ export default function Home() {
                                 />
                               )}
                             </div>
-                            <div className="p-4">
-                              <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
-                                {project.title}
-                              </h3>
-                              <p className="mt-1 text-sm text-white/60 transition-colors duration-500">
-                                {project.description}
-                              </p>
+                            <div className="flex items-end justify-between gap-3 p-4">
+                              <div>
+                                <h3 className="text-lg font-bold uppercase tracking-tight text-white transition-colors duration-500">
+                                  {project.title}
+                                </h3>
+                                <p className="mt-1 text-sm text-white/60 transition-colors duration-500">
+                                  {project.description}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault()
+                                  e.stopPropagation()
+                                  setEnlargedProjectId(isEnlarged ? null : project.id)
+                                }}
+                                aria-label={isEnlarged ? "Shrink video" : "Enlarge video"}
+                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/10 text-white/70 transition-all duration-300 hover:scale-110 hover:bg-white/20 hover:text-white"
+                              >
+                                {isEnlarged ? (
+                                  <Minimize2 className="h-4 w-4" />
+                                ) : (
+                                  <Maximize2 className="h-4 w-4" />
+                                )}
+                              </button>
                             </div>
-                          </a>
+                          </motion.a>
                         )
                       })}
                     </div>
@@ -580,6 +650,97 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              </motion.div>
+
+              <div className="flex justify-center pt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsGalleryOpen((open) => !open)}
+                  aria-label={isGalleryOpen ? "Back to work" : "Open Behind the Work photo gallery"}
+                  className="group flex flex-col items-center gap-3 text-white/80 transition-colors duration-300 hover:text-white"
+                >
+                  <span className="text-sm font-bold uppercase tracking-[0.3em]">
+                    {isGalleryOpen ? "Back to work" : "Behind the Work"}
+                  </span>
+                  <span className="relative flex h-16 w-16 items-center justify-center">
+                    {!isGalleryOpen && (
+                      <span className="absolute inset-0 animate-ping rounded-full border-2 border-white/30" />
+                    )}
+                    <span className="relative flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 shadow-lg shadow-white/10 transition-all duration-300 group-hover:scale-110 group-hover:border-white group-hover:bg-white group-hover:text-black">
+                      <motion.span
+                        animate={{ rotate: isGalleryOpen ? 180 : 0 }}
+                        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+                        className="flex"
+                      >
+                        <ChevronDown className={`h-8 w-8 ${isGalleryOpen ? "" : "animate-bounce"}`} />
+                      </motion.span>
+                    </span>
+                  </span>
+                </button>
+              </div>
+
+              <AnimatePresence initial={false}>
+                {isGalleryOpen && (
+                  <motion.div
+                    key="gallery"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div className="relative pb-6 pt-6">
+                      <div className="overflow-hidden rounded-xl" ref={galleryEmblaRef}>
+                        <div className="flex">
+                          {galleryPhotos.map((photo) => (
+                            <div key={photo.src} className="min-w-0 flex-[0_0_100%]">
+                              <div className="relative h-[340px] sm:h-[440px] lg:h-[520px] overflow-hidden rounded-xl border-2 border-white/15 bg-white/5 shadow-2xl">
+                                <Image
+                                  src={photo.src}
+                                  alt={photo.alt}
+                                  fill
+                                  sizes="(min-width: 1024px) 1100px, 100vw"
+                                  className="object-contain"
+                                />
+                              </div>
+                              <p className="mt-3 text-center text-sm text-white/60">{photo.alt}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => galleryEmblaApi?.scrollPrev()}
+                        aria-label="Previous photo"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/60 p-2 text-white/80 backdrop-blur transition hover:bg-black/80 hover:text-white"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </button>
+                      <button
+                        onClick={() => galleryEmblaApi?.scrollNext()}
+                        aria-label="Next photo"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-black/60 p-2 text-white/80 backdrop-blur transition hover:bg-black/80 hover:text-white"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </button>
+
+                      <div className="mt-4 flex items-center justify-center gap-2">
+                        {galleryPhotos.map((photo, index) => (
+                          <button
+                            key={photo.src}
+                            onClick={() => galleryEmblaApi?.scrollTo(index)}
+                            aria-label={`Go to photo ${index + 1}`}
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              index === gallerySlide ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/50"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <Dialog open={!!selectedTutorial} onOpenChange={(open) => !open && setSelectedTutorial(null)}>
                 <DialogContent 
