@@ -94,7 +94,7 @@ export default function Home() {
       if (cancelled) return
       player = new (window as any).YT.Player("song-player", {
         videoId: "vTHtvnUBKAw",
-        playerVars: { autoplay: 1, start: 251 },
+        playerVars: { autoplay: 1, start: 253 },
         events: {
           onReady: (e: any) => {
             e.target.setVolume(25)
