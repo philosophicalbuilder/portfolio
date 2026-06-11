@@ -52,7 +52,7 @@ function ViewsCounter({ active }: { active: boolean }) {
   useEffect(() => {
     if (!active) return
     const target = 18000
-    const duration = 6000
+    const duration = 80000
     let raf = 0
     // Wait for the entry reveal to finish before spinning up
     const timer = window.setTimeout(() => {
@@ -71,13 +71,9 @@ function ViewsCounter({ active }: { active: boolean }) {
   }, [active])
 
   return (
-    <div className="flex items-center gap-2.5 pt-1">
-      <span className="relative flex h-2 w-2" aria-hidden>
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-      </span>
-      <Eye className="h-4 w-4 text-white/50" />
-      <span className="font-mono text-sm font-semibold tabular-nums text-white">{count.toLocaleString()}</span>
+    <div className="flex items-center gap-3 pt-1">
+      <Eye className="h-5 w-5 text-white/50" />
+      <span className="font-mono text-2xl font-bold tabular-nums text-white">{count.toLocaleString()}</span>
       <span className="text-xs uppercase tracking-wider text-white/50">views</span>
     </div>
   )
@@ -390,8 +386,6 @@ export default function Home() {
                 My YouTube Channel
                 <ExternalLink className="h-4 w-4" />
               </a>
-
-              <ViewsCounter active={hasEntered} />
             </div>
 
             <div className="flex flex-1 flex-col">
@@ -409,7 +403,7 @@ export default function Home() {
                   />
                   <div>
                     <p className="text-base font-bold text-white transition-colors duration-500">NASA</p>
-                    <p className="text-sm text-white/70 transition-colors duration-500">Product Designer and PM</p>
+                    <p className="text-sm text-white/70 transition-colors duration-500">Software Engineer</p>
                   </div>
                 </div>
 
@@ -502,6 +496,7 @@ export default function Home() {
                     </span>
                   )}
                 </button>
+
                 {isSongPlaying && (
                   <div className="pointer-events-none fixed -left-[9999px] h-px w-px overflow-hidden opacity-0">
                     <div id="song-player" />
@@ -666,6 +661,10 @@ export default function Home() {
                           </motion.a>
                         )
                       })}
+                    </div>
+
+                    <div className="flex justify-end pt-4">
+                      <ViewsCounter active={hasEntered} />
                     </div>
                   </div>
 
