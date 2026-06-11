@@ -98,6 +98,7 @@ export default function Home() {
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
   const [isSongPlaying, setIsSongPlaying] = useState(false)
   const [hasEntered, setHasEntered] = useState(false)
+  const [isRevealed, setIsRevealed] = useState(false)
   const [enlargedProjectId, setEnlargedProjectId] = useState<number | null>(null)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
   const [hasScrolledPaper, setHasScrolledPaper] = useState(false)
@@ -315,9 +316,10 @@ export default function Home() {
               type="button"
               onClick={() => {
                 setHasEntered(true)
-                // Let the reveal animation land before the YouTube player spins up;
+                // Let the reveal animation land before any YouTube player spins up;
                 // sticky user activation keeps autoplay-with-sound allowed
                 window.setTimeout(() => setIsSongPlaying(true), 1100)
+                window.setTimeout(() => setIsRevealed(true), 1300)
               }}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -589,7 +591,9 @@ export default function Home() {
                         const videoId = isYouTube ? getYouTubeVideoId(project.link) : null
                         // Get timestamp from URL, or default to 60 seconds (middle-ish for most videos)
                         const startTime = isYouTube ? (getYouTubeTimestamp(project.link) ?? 60) : 0
-                        const shouldShowVideo = isYouTube && videoId
+                        // Hold the live embeds back until the entry animation has landed —
+                        // compositing six video streams mid-transform causes jitter
+                        const shouldShowVideo = isYouTube && videoId && isRevealed
                         const isEnlarged = enlargedProjectId === project.id
                         const isDocked = enlargedProjectId !== null && !isEnlarged
 
