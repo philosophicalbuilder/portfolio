@@ -63,7 +63,7 @@ function ViewsCounter({ active }: { active: boolean }) {
         if (t < 1) raf = requestAnimationFrame(tick)
       }
       raf = requestAnimationFrame(tick)
-    }, 1400)
+    }, 400)
     return () => {
       window.clearTimeout(timer)
       cancelAnimationFrame(raf)
