@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Maximize2, Minimize2, Play, Square } from "lucide-react"
+import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink, Eye, Maximize2, Minimize2, Play, Square } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import useEmblaCarousel from "embla-carousel-react"
 import { AnimatePresence, motion } from "framer-motion"
@@ -59,10 +59,31 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"projects" | "tutorials" | "publications">("projects")
   const [selectedTutorial, setSelectedTutorial] = useState<Tutorial | null>(null)
   const [isSongPlaying, setIsSongPlaying] = useState(false)
+  const [hasEntered, setHasEntered] = useState(false)
   const [enlargedProjectId, setEnlargedProjectId] = useState<number | null>(null)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [hasScrolledPaper, setHasScrolledPaper] = useState(false)
+  const [viewCount, setViewCount] = useState(0)
+
+  // Views counter — races up and eases to a stop at 18,000
+  useEffect(() => {
+    if (!hasEntered) return
+    const target = 18000
+    const duration = 6000
+    const start = performance.now()
+    let raf: number
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 4)
+      setViewCount(Math.round(target * eased))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [hasEntered])
 
   const galleryPhotos: { src: string; alt: string }[] = [
+    { src: "/gallery/pool.jpg", alt: "Lining up a shot at the pool table" },
     { src: "/gallery/nasa-worm.jpg", alt: "With the team at the NASA worm sculpture" },
     { src: "/gallery/nasa-hq.jpg", alt: "Badge in hand at NASA Headquarters" },
     { src: "/gallery/speaking.jpg", alt: "Speaking at a Virginia event" },
@@ -70,7 +91,6 @@ export default function Home() {
     { src: "/gallery/fbi-badge.jpg", alt: "UVA/MIT FBI STB intern badge" },
     { src: "/gallery/panel.jpg", alt: "On a roundtable panel" },
     { src: "/gallery/eeob.jpg", alt: "Eisenhower Executive Office Building" },
-    { src: "/gallery/pool.jpg", alt: "Lining up a shot at the pool table" },
   ]
 
   // Sliding gallery — one photo per slide
@@ -120,8 +140,8 @@ export default function Home() {
     const createPlayer = () => {
       if (cancelled) return
       player = new (window as any).YT.Player("song-player", {
-        videoId: "vTHtvnUBKAw",
-        playerVars: { autoplay: 1, start: 254 },
+        videoId: "I7DSQXuf3LI",
+        playerVars: { autoplay: 1, start: 185 },
         events: {
           onReady: (e: any) => {
             e.target.setVolume(25)
@@ -263,9 +283,65 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black p-6 transition-colors duration-500 md:p-8 lg:p-8 min-[1710px]:lg:p-12">
-      <div className="mx-auto w-full max-w-none min-[1710px]:max-w-[1710px]">
+      <AnimatePresence>
+        {!hasEntered && (
+          <motion.div
+            key="intro"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black"
+            exit={{ opacity: 0, scale: 1.04, filter: "blur(12px)" }}
+            transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <motion.button
+              type="button"
+              onClick={() => {
+                setIsSongPlaying(true)
+                setHasEntered(true)
+              }}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+              className="group flex flex-col items-center gap-8 px-8 text-center"
+            >
+              <span className="text-xs font-bold uppercase tracking-[0.35em] text-white/50 transition-colors duration-500 group-hover:text-white/80">
+                Ramkrishna Sharma
+              </span>
+              <span className="relative flex h-28 w-28 items-center justify-center">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/20" aria-hidden />
+                <span className="relative flex h-28 w-28 items-center justify-center rounded-full border-2 border-white/30 bg-white/5 text-white backdrop-blur transition-all duration-500 group-hover:scale-105 group-hover:border-white group-hover:bg-white group-hover:text-black">
+                  <Play className="ml-1.5 h-10 w-10 fill-current" />
+                </span>
+              </span>
+              <span className="space-y-2">
+                <span className="block text-2xl font-bold uppercase tracking-wider text-white">Play Me</span>
+                <span className="block text-sm text-white/50">Press play to step inside</span>
+              </span>
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        initial="hidden"
+        animate={hasEntered ? "show" : "hidden"}
+        variants={{
+          hidden: { opacity: 0, filter: "blur(16px)", scale: 1.02 },
+          show: {
+            opacity: 1,
+            filter: "blur(0px)",
+            scale: 1,
+            transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.22, delayChildren: 0.25 },
+          },
+        }}
+        className="mx-auto w-full max-w-none min-[1710px]:max-w-[1710px]"
+      >
         <div className="grid gap-8 min-[1710px]:grid-cols-[300px_1fr] lg:gap-12">
-          <div className="flex flex-col gap-6">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 48 },
+              show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] } },
+            }}
+            className="flex flex-col gap-6"
+          >
             <div className="h-48 w-48 overflow-hidden rounded-full border-2 border-white transition-colors duration-500 md:h-64 md:w-64">
               <Image
                 src="/profile.jpeg"
@@ -293,6 +369,18 @@ export default function Home() {
                 My YouTube Channel
                 <ExternalLink className="h-4 w-4" />
               </a>
+
+              <div className="flex items-center gap-2.5 pt-1">
+                <span className="relative flex h-2 w-2" aria-hidden>
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                </span>
+                <Eye className="h-4 w-4 text-white/50" />
+                <span className="font-mono text-sm font-semibold tabular-nums text-white">
+                  {viewCount.toLocaleString()}
+                </span>
+                <span className="text-xs uppercase tracking-wider text-white/50">views</span>
+              </div>
             </div>
 
             <div className="flex flex-1 flex-col">
@@ -410,9 +498,15 @@ export default function Home() {
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="space-y-6">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 48 },
+              show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.22, 1, 0.36, 1] } },
+            }}
+            className="space-y-6"
+          >
             <div className="space-y-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -565,18 +659,37 @@ export default function Home() {
                           key={publication.id}
                           className="grid items-start gap-10 lg:grid-cols-[minmax(0,520px)_1fr]"
                         >
-                          <div className="h-[65vh] space-y-4 overflow-y-auto rounded-lg">
-                            {Array.from({ length: publication.pageCount }, (_, i) => (
-                              <Image
-                                key={i}
-                                src={`${publication.pagesPath}/page-${i + 1}.jpg`}
-                                alt={`${publication.title} — page ${i + 1}`}
-                                width={1200}
-                                height={1553}
-                                className="w-full rounded-lg shadow-2xl"
-                                priority={i === 0}
-                              />
-                            ))}
+                          <div className="relative">
+                            <div
+                              className="h-[65vh] space-y-4 overflow-y-auto rounded-lg"
+                              onScroll={(e) => {
+                                if (!hasScrolledPaper && e.currentTarget.scrollTop > 40) setHasScrolledPaper(true)
+                              }}
+                            >
+                              {Array.from({ length: publication.pageCount }, (_, i) => (
+                                <Image
+                                  key={i}
+                                  src={`${publication.pagesPath}/page-${i + 1}.jpg`}
+                                  alt={`${publication.title} — page ${i + 1}`}
+                                  width={1200}
+                                  height={1553}
+                                  className="w-full rounded-lg shadow-2xl"
+                                  priority={i === 0}
+                                />
+                              ))}
+                            </div>
+
+                            <div
+                              aria-hidden
+                              className={`pointer-events-none absolute inset-x-0 bottom-0 flex h-28 flex-col items-center justify-end rounded-b-lg bg-gradient-to-t from-black via-black/60 to-transparent pb-3 transition-opacity duration-700 ${
+                                hasScrolledPaper ? "opacity-0" : "opacity-100"
+                              }`}
+                            >
+                              <span className="flex flex-col items-center gap-1 text-white/80">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Scroll to read</span>
+                                <ChevronDown className="h-5 w-5 animate-bounce" />
+                              </span>
+                            </div>
                           </div>
 
                           <div className="space-y-4">
@@ -780,9 +893,9 @@ export default function Home() {
                 </DialogContent>
               </Dialog>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
