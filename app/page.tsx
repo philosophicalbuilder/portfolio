@@ -45,6 +45,44 @@ type Tutorial = {
   status?: "live" | "coming-soon"
 }
 
+// Isolated so its per-frame state updates don't re-render the whole page
+function ViewsCounter({ active }: { active: boolean }) {
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!active) return
+    const target = 18000
+    const duration = 6000
+    let raf = 0
+    // Wait for the entry reveal to finish before spinning up
+    const timer = window.setTimeout(() => {
+      const start = performance.now()
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / duration, 1)
+        setCount(Math.round(target * (1 - Math.pow(1 - t, 4))))
+        if (t < 1) raf = requestAnimationFrame(tick)
+      }
+      raf = requestAnimationFrame(tick)
+    }, 1400)
+    return () => {
+      window.clearTimeout(timer)
+      cancelAnimationFrame(raf)
+    }
+  }, [active])
+
+  return (
+    <div className="flex items-center gap-2.5 pt-1">
+      <span className="relative flex h-2 w-2" aria-hidden>
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+      </span>
+      <Eye className="h-4 w-4 text-white/50" />
+      <span className="font-mono text-sm font-semibold tabular-nums text-white">{count.toLocaleString()}</span>
+      <span className="text-xs uppercase tracking-wider text-white/50">views</span>
+    </div>
+  )
+}
+
 type Publication = {
   id: number
   title: string
@@ -63,24 +101,6 @@ export default function Home() {
   const [enlargedProjectId, setEnlargedProjectId] = useState<number | null>(null)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
   const [hasScrolledPaper, setHasScrolledPaper] = useState(false)
-  const [viewCount, setViewCount] = useState(0)
-
-  // Views counter — races up and eases to a stop at 18,000
-  useEffect(() => {
-    if (!hasEntered) return
-    const target = 18000
-    const duration = 6000
-    const start = performance.now()
-    let raf: number
-    const tick = (now: number) => {
-      const t = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - t, 4)
-      setViewCount(Math.round(target * eased))
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [hasEntered])
 
   const galleryPhotos: { src: string; alt: string }[] = [
     { src: "/gallery/pool.jpg", alt: "Lining up a shot at the pool table" },
@@ -288,14 +308,16 @@ export default function Home() {
           <motion.div
             key="intro"
             className="fixed inset-0 z-50 flex items-center justify-center bg-black"
-            exit={{ opacity: 0, scale: 1.04, filter: "blur(12px)" }}
-            transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1] }}
+            exit={{ opacity: 0, scale: 1.04 }}
+            transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
           >
             <motion.button
               type="button"
               onClick={() => {
-                setIsSongPlaying(true)
                 setHasEntered(true)
+                // Let the reveal animation land before the YouTube player spins up;
+                // sticky user activation keeps autoplay-with-sound allowed
+                window.setTimeout(() => setIsSongPlaying(true), 1100)
               }}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -324,12 +346,10 @@ export default function Home() {
         initial="hidden"
         animate={hasEntered ? "show" : "hidden"}
         variants={{
-          hidden: { opacity: 0, filter: "blur(16px)", scale: 1.02 },
+          hidden: { opacity: 0 },
           show: {
             opacity: 1,
-            filter: "blur(0px)",
-            scale: 1,
-            transition: { duration: 1.4, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.22, delayChildren: 0.25 },
+            transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], staggerChildren: 0.18, delayChildren: 0.1 },
           },
         }}
         className="mx-auto w-full max-w-none min-[1710px]:max-w-[1710px]"
@@ -370,17 +390,7 @@ export default function Home() {
                 <ExternalLink className="h-4 w-4" />
               </a>
 
-              <div className="flex items-center gap-2.5 pt-1">
-                <span className="relative flex h-2 w-2" aria-hidden>
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                </span>
-                <Eye className="h-4 w-4 text-white/50" />
-                <span className="font-mono text-sm font-semibold tabular-nums text-white">
-                  {viewCount.toLocaleString()}
-                </span>
-                <span className="text-xs uppercase tracking-wider text-white/50">views</span>
-              </div>
+              <ViewsCounter active={hasEntered} />
             </div>
 
             <div className="flex flex-1 flex-col">
@@ -514,43 +524,48 @@ export default function Home() {
                     WORK
                   </h2>
                   <p className="mt-2 text-sm text-white/60 transition-colors duration-500">
-                    Toggle between shipped projects, publications, and written deep-dives.
+                    Pan through shipped projects, publications, and written deep-dives.
                   </p>
                 </div>
 
-                <div className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 p-1 text-xs font-medium uppercase tracking-wide text-white/60">
+                <div className="flex items-center gap-4">
                   <button
                     type="button"
-                    onClick={() => goToSection("projects")}
-                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
-                      activeTab === "projects"
-                        ? "bg-white text-black shadow-sm"
-                        : "text-white/60 hover:bg-white/10"
-                    }`}
+                    onClick={() => {
+                      const idx = sectionOrder.indexOf(activeTab)
+                      if (idx > 0) goToSection(sectionOrder[idx - 1])
+                    }}
+                    disabled={activeTab === sectionOrder[0]}
+                    aria-label="Previous section"
+                    className="group flex h-12 w-12 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 text-white/80 shadow-lg shadow-white/10 transition-all duration-300 hover:scale-110 hover:border-white hover:bg-white hover:text-black disabled:pointer-events-none disabled:opacity-25"
                   >
-                    Projects
+                    <ChevronLeft className="h-6 w-6" />
                   </button>
+
+                  <span className="min-w-[11rem] text-center text-sm font-bold uppercase tracking-[0.3em] text-white">
+                    {activeTab === "projects"
+                      ? "Projects"
+                      : activeTab === "publications"
+                        ? "Publications"
+                        : "Tutorials"}
+                  </span>
+
                   <button
                     type="button"
-                    onClick={() => goToSection("publications")}
-                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
-                      activeTab === "publications"
-                        ? "bg-white text-black shadow-sm"
-                        : "text-white/60 hover:bg-white/10"
-                    }`}
+                    onClick={() => {
+                      const idx = sectionOrder.indexOf(activeTab)
+                      if (idx < sectionOrder.length - 1) goToSection(sectionOrder[idx + 1])
+                    }}
+                    disabled={activeTab === sectionOrder[sectionOrder.length - 1]}
+                    aria-label="Next section"
+                    className="group relative flex h-12 w-12 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:scale-110 disabled:pointer-events-none disabled:opacity-25"
                   >
-                    Publications
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goToSection("tutorials")}
-                    className={`rounded-full px-3 py-1 transition-all duration-200 ${
-                      activeTab === "tutorials"
-                        ? "bg-white text-black shadow-sm"
-                        : "text-white/60 hover:bg-white/10"
-                    }`}
-                  >
-                    Written Tutorials
+                    {activeTab !== sectionOrder[sectionOrder.length - 1] && (
+                      <span className="absolute inset-0 animate-ping rounded-full border-2 border-white/30" aria-hidden />
+                    )}
+                    <span className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-white/40 bg-white/10 shadow-lg shadow-white/10 transition-all duration-300 group-hover:border-white group-hover:bg-white group-hover:text-black">
+                      <ChevronRight className="h-6 w-6" />
+                    </span>
                   </button>
                 </div>
               </div>
