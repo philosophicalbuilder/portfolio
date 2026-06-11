@@ -316,9 +316,8 @@ export default function Home() {
               type="button"
               onClick={() => {
                 setHasEntered(true)
-                // Let the reveal animation land before any YouTube player spins up;
-                // sticky user activation keeps autoplay-with-sound allowed
-                window.setTimeout(() => setIsSongPlaying(true), 1100)
+                setIsSongPlaying(true)
+                // Hold the project video embeds until the reveal animation lands
                 window.setTimeout(() => setIsRevealed(true), 1300)
               }}
               initial={{ opacity: 0, y: 16 }}
